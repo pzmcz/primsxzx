@@ -1,25 +1,105 @@
+const fs = require('fs');
 const { exec } = require('child_process');
+const { promisify } = require('util');
+
+const npmInstall = promisify(exec);
+const clearConsole = () => exec(process.platform === 'win32' ? 'cls' : 'clear');
 
 async function installDiscordJS(callback) {
-  console.log("Installing discord.js...");
-  console.log("Fetching discord.js@latest");
+  try {
+    console.log("Installing discord.js...");
+    await clearConsole();
 
-  exec('npm install discord.js@latest', (error, stdout, stderr) => {
-    if (error) {
-      console.error(`Error installing discord.js: ${error.message}`);
+    if (isDiscordJSPresent()) {
+      console.log("discord.js is already installed! Run updateDiscordJS to update to the latest version.");
       return;
     }
-    if (stderr) {
-      console.error(`Error installing discord.js: ${stderr}`);
-      return;
-    }
-    console.log(`discord.js installed successfully.`);
+
+    console.log("Fetching discord.js@latest");
+    await clearConsole();
+
+    console.log("Installing discord.js@latest");
+    await clearConsole();
+
+    console.log("Please wait as this process takes a while...");
+    await npmInstall('npm install discord.js@latest');
+    await clearConsole();
+
+    console.log("discord.js installed successfully.");
+    await clearConsole();
+
+    await generateBotTemplate();
+    await clearConsole();
+
     if (callback) {
       callback();
     }
-  });
+  } catch (error) {
+    console.error(`Error installing discord.js: ${error.message}`);
+  }
+}
+
+async function updateDiscordJS(callback) {
+  try {
+    console.log("Updating discord.js...");
+    await clearConsole();
+
+    if (!isDiscordJSPresent()) {
+      console.log("discord.js is not installed! Run installDiscordJS to install the latest version!");
+      return;
+    }
+
+    console.log("Updating discord.js@latest");
+    await clearConsole();
+
+    console.log("Please wait as this process takes a while...");
+    await npmInstall('npm install discord.js@latest');
+    await clearConsole();
+
+    console.log("discord.js updated successfully.");
+    await clearConsole();
+
+    await generateBotTemplate();
+    await clearConsole();
+
+    if (callback) {
+      callback();
+    }
+  } catch (error) {
+    console.error(`Error updating discord.js: ${error.message}`);
+  }
+}
+
+async function generateBotTemplate() {
+  const botTemplate = `const Discord = require('discord.js');
+const client = new Discord.Client();
+
+client.once('ready', () => {
+  console.log('Bot is ready!');
+});
+
+client.login('YOUR_DISCORD_BOT_TOKEN'); // Replace with your bot token`;
+
+  const indexFilePath = './index.js';
+
+  try {
+    await fs.promises.writeFile(indexFilePath, botTemplate);
+    console.log(`Basic Discord bot template generated in ${indexFilePath}`);
+  } catch (error) {
+    console.error(`Error generating bot template: ${error.message}`);
+  }
+}
+
+function isDiscordJSPresent() {
+  try {
+    require.resolve('discord.js');
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
 
 module.exports = {
-  installDiscordJS
+  installDiscordJS,
+  updateDiscordJS
 };
