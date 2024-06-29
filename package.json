@@ -1,0 +1,13 @@
+{
+  "name": "primsxzx",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "node postinstall.js"
+  },
+  "dependencies": {
+    "ncp": "^2.0.0"
+  },
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT"
+}
