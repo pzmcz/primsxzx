@@ -4,5 +4,8 @@
   "main": "index.js",
   "scripts": {
     "postinstall": "node postinstall.js"
+  },
+  "dependencies": {
+    "ncp": "^2.0.0"
   }
 }
