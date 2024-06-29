@@ -71,14 +71,38 @@ async function updateDiscordJS(callback) {
 }
 
 async function generateBotTemplate() {
-  const botTemplate = `const Discord = require('discord.js');
-const client = new Discord.Client();
-
-client.once('ready', () => {
-  console.log('Bot is ready!');
+  const botTemplate = `const { Discord, Client, GatewayIntentBits } = require('discord.js');
+const client = new Client({
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildVoiceStates,
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.DirectMessages,
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildPresences
+    ],
 });
 
-client.login('YOUR_DISCORD_BOT_TOKEN'); // Replace with your bot token`;
+client.once('ready', () => {
+    console.log("Logged in as "+client.user.tag+"!");
+    client.application.commands.create({
+        name: 'ping',
+        description: 'Ping command to check bot latency.',
+    });
+});
+
+client.on('interactionCreate', async (interaction) => {
+    if (!interaction.isCommand()) return;
+
+    const { commandName } = interaction;
+
+    if (commandName === 'ping') {
+        await interaction.reply('Pong!');
+    }
+});
+
+client.login('TOKEN_HERE'); // Replace with your bot token`;
 
   const indexFilePath = './index.js';
 
